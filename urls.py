@@ -6,14 +6,17 @@ from django.conf import settings
 from rest_framework import routers
 from rest_framework_jwt.views import obtain_jwt_token
 
+from apps.workout_tracker.views import ProgramAPIViewSet
+
 
 admin.site.site_header = settings.SITE_ADMIN_TITLE
 
-router = routers.DefaultRouter()
+api_router = routers.DefaultRouter()
+api_router.register(r'programs', ProgramAPIViewSet, base_name='programs')
 
 urlpatterns = [
 
-    url(r'^api/', include(router.urls)),
+    url(r'^api/', include(api_router.urls)),
     url(r'^api/login/', obtain_jwt_token),
 
     url(r'^admin/', include(admin.site.urls)),

@@ -9,3 +9,5 @@ environment
 .env/*
 
 *.sqlite3
+
+.DS_Store
