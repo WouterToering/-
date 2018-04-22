@@ -2,6 +2,10 @@ from apps.workout_tracker.models.template import (
     Program,
     Week,
     Workout,
-    Exercise,
-    ExerciseVolume
+    ExerciseType,
+    Exercise
+)
+from apps.workout_tracker.models.log import (
+    WorkoutLog,
+    ExerciseLog
 )

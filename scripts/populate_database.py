@@ -3,8 +3,8 @@
 from apps.workout_tracker.models import *  # noqa
 
 # Delete potential old data
-ExerciseVolume.objects.all().delete()
 Exercise.objects.all().delete()
+ExerciseType.objects.all().delete()
 Workout.objects.all().delete()
 Week.objects.all().delete()
 Program.objects.all().delete()
@@ -19,17 +19,17 @@ weeks = dict(
 
 _ = [o.save() for _, o in weeks.items()]
 
-exercises = dict(
-    bench=Exercise(name='Bench press', weight_progression=5),
-    squat=Exercise(name='Squat', weight_progression=7.5),
-    dl=Exercise(name='Deadlift', weight_progression=7.5),
-    row=Exercise(name='Barbell row', weight_progression=7.5),
-    ohp=Exercise(name='Overhead press', weight_progression=2.5),
-    chinup=Exercise(name='Chinup', weight_progression=0)
+exercise_types = dict(
+    bench=ExerciseType(name='Bench press', weight_progression=5),
+    squat=ExerciseType(name='Squat', weight_progression=7.5),
+    dl=ExerciseType(name='Deadlift', weight_progression=7.5),
+    row=ExerciseType(name='Barbell row', weight_progression=7.5),
+    ohp=ExerciseType(name='Overhead press', weight_progression=2.5),
+    chinup=ExerciseType(name='Chinup', weight_progression=0)
 )
 
 
-_ = [o.save() for _, o in exercises.items()]
+_ = [o.save() for _, o in exercise_types.items()]
 
 workouts_week_a = dict(
     day_1=Workout(week_id=weeks['a'].id, name='Day 1', position=0),
@@ -99,31 +99,28 @@ for week, days in sorted(bla.items(), key=lambda x: x[0]):
     for day, exercise_lists in sorted(days.items(), key=lambda x: x[0]):
         workout_obj = whatever[week][day]
 
-        i=0
+        i = 0
 
         for exercise_list in exercise_lists:
             exercise_name, sets, reps = exercise_list
-            exercise_obj = exercises[exercise_name]
+            exercise_type_obj = exercise_types[exercise_name]
 
             kwargs = {
                 'workout_id': workout_obj.id,
-                'exercise_id': exercise_obj.id,
+                'exercise_type_id': exercise_type_obj.id,
                 'weight_multiplier': 1,
-                'is_amrap': False,
                 'position': i
             }
 
             if reps == 8:
                 kwargs['weight_multiplier'] = 0.9
 
-            ExerciseVolume(**kwargs, sets=sets, reps=reps).save()
+            Exercise(**kwargs, sets=sets, reps=reps).save()
 
             if sets == 3:
                 i += 1
                 kwargs['is_amrap'] = True
                 kwargs['position'] = i
-                ExerciseVolume(**kwargs, sets=0
-
-                        , reps=0).save()
+                Exercise(**kwargs).save()
 
             i += 1

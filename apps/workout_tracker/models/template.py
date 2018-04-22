@@ -43,7 +43,7 @@ class Workout(ModelMixinBundle):
         unique_together = ('week', 'name')
 
 
-class Exercise(ModelMixinBundle):
+class ExerciseType(ModelMixinBundle):
     name = models.CharField(
         db_index=True,
         null=False,
@@ -57,12 +57,12 @@ class Exercise(ModelMixinBundle):
     )
 
 
-class ExerciseVolume(ModelMixinBundle):
-    sets = models.PositiveSmallIntegerField()
-    reps = models.PositiveSmallIntegerField()
+class Exercise(ModelMixinBundle):
+    sets = models.PositiveSmallIntegerField(null=True)
+    reps = models.PositiveSmallIntegerField(null=True)
     weight_multiplier = models.DecimalField(max_digits=3, decimal_places=2)
-    is_amrap = models.BooleanField()
+    is_amrap = models.NullBooleanField()
 
-    exercise = models.ForeignKey('Exercise')
+    exercise_type = models.ForeignKey('ExerciseType')
     workout = models.ForeignKey('Workout', related_name='exercises')
     position = models.PositiveSmallIntegerField(null=False)
