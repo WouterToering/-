@@ -11,25 +11,25 @@ class HashedKeyModelMixin(models.Model):
 
         This is the one that should be used by DRF serializers!
     """
-    key = models.CharField(
-        max_length=32,
+    key = models.UUIDField(
         db_index=True,
         unique=True,
-        null=True,
-        editable=False
+        null=False,
+        editable=False,
+        default=uuid.uuid4
     )
 
     class Meta:
         abstract = True
 
-    def save(self, *args, **kwargs):
-        if not self.key:  # '' is not unique, NULL is ignored
-            self.key = None
+    # def save(self, *args, **kwargs):
+    #     if not self.key:  # '' is not unique, NULL is ignored
+    #         self.key = None
 
-        super(HashedKeyModelMixin, self).save(*args, **kwargs)
-        if not self.key or self.key is None:
-            self.key = uuid.uuid4().hex
-            models.Model.save(self, update_fields=['key'])
+    #     super(HashedKeyModelMixin, self).save(*args, **kwargs)
+    #     if not self.key or self.key is None:
+    #         self.key = uuid.uuid4().hex
+    #         models.Model.save(self, update_fields=['key'])
 
 
 class CreatedAtModelMixin(models.Model):
@@ -114,7 +114,7 @@ class HasChangedMixin(models.Model):
         return model_to_dict(self, _fields)
 
 
-class ModelMixinBundle(HashedKeyModelMixin, CreatedAtModelMixin, UpdatedAtModelMixin, HasChangedMixin):
+class ModelMixinBundle(CreatedAtModelMixin, UpdatedAtModelMixin, HasChangedMixin):
     """ Mixin-bundle with our three base model-mixins
     """
     class Meta:
