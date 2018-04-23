@@ -63,6 +63,6 @@ class Exercise(ModelMixinBundle):
     weight_multiplier = models.DecimalField(max_digits=3, decimal_places=2)
     is_amrap = models.NullBooleanField()
 
-    exercise_type = models.ForeignKey('ExerciseType')
-    workout = models.ForeignKey('Workout', related_name='exercises')
+    exercise_type = models.ForeignKey('ExerciseType', on_delete=models.CASCADE)
+    workout = models.ForeignKey('Workout', related_name='exercises', on_delete=models.CASCADE)
     position = models.PositiveSmallIntegerField(null=False)

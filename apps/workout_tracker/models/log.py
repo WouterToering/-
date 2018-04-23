@@ -22,7 +22,7 @@ class WorkoutLog(ModelMixinBundle):
     )
     finished_at = models.DateTimeField(editable=False, null=True)
 
-    workout = models.ForeignKey('Workout')
+    workout = models.ForeignKey('Workout', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if (kwargs.get('status') == LogStatus.FINISHED and self.status !=
@@ -39,8 +39,8 @@ class ExerciseLog(ModelMixinBundle):
     )
     completed = models.NullBooleanField()
 
-    workout = models.ForeignKey('WorkoutLog')
-    exercise = models.ForeignKey('Exercise')
+    workout = models.ForeignKey('WorkoutLog', on_delete=models.CASCADE)
+    exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if (kwargs.get('status') == LogStatus.FINISHED and self.status !=
