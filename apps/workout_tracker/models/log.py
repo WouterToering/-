@@ -12,7 +12,7 @@ class LogStatus(enum.Enum):
     FINISHED = 2
 
 
-LOG_STATUS_CHOICES = ((e.value, e.name) for e in list(LogStatus))
+LOG_STATUS_CHOICES = tuple((e.value, e.name) for e in list(LogStatus))
 
 
 class WorkoutLog(ModelMixinBundle):
@@ -20,7 +20,7 @@ class WorkoutLog(ModelMixinBundle):
         choices=LOG_STATUS_CHOICES,
         default=LogStatus.NOT_STARTED.value
     )
-    finished_at = models.DateTimeField(db_index=True, editable=False)
+    finished_at = models.DateTimeField(editable=False, null=True)
 
     workout = models.ForeignKey('Workout')
 

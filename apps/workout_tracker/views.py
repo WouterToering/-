@@ -5,18 +5,17 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from apps.main.metadata import MinimalMetadata
-from apps.workout_tracker.models import Program
-from apps.workout_tracker.serializers import ProgramSerializer
+from apps.workout_tracker.models import WorkoutLog
+from apps.workout_tracker.serializers import WorkoutLogsSerializer
 
 
-class ProgramAPIViewSet(ModelViewSet):
-    model = Program
-    renderer_classes = (JSONRenderer,)
-    serializer_class = ProgramSerializer
+class WorkoutLogAPIViewSet(ModelViewSet):
+    model = WorkoutLog
+    serializer_class = WorkoutLogsSerializer
     metadata_class = MinimalMetadata
 
     def get_queryset(self) -> QuerySet:
-        return Program.objects.all()
+        return WorkoutLog.objects.all()
 
     def list(self, request, *args, **kwargs) -> Response:
         programs = self.get_queryset()
