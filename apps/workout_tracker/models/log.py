@@ -10,6 +10,7 @@ class LogStatus(enum.Enum):
     NOT_STARTED = 0
     IN_PROGRESS = 1
     FINISHED = 2
+    FAILED = 3
 
 
 LOG_STATUS_CHOICES = tuple((e.value, e.name) for e in list(LogStatus))
@@ -37,7 +38,12 @@ class ExerciseLog(ModelMixinBundle):
         choices=LOG_STATUS_CHOICES,
         default=LogStatus.NOT_STARTED.value
     )
-    completed = models.NullBooleanField()
+    weight = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        null=False
+    )
+    amrap_reps = models.PositiveSmallIntegerField(null=False)
 
     workout = models.ForeignKey('WorkoutLog', on_delete=models.CASCADE)
     exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)

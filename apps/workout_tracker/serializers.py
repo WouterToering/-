@@ -48,6 +48,10 @@ class WorkoutSerializer(serializers.ModelSerializer):
         )
 
 
+def _get_next_workout_id():
+    return 1
+
+
 class WorkoutLogsSerializer(serializers.ModelSerializer):
     status = ChoiceField(choices=LOG_STATUS_CHOICES, default=0)
     workout = WorkoutSerializer(read_only=True)
@@ -65,6 +69,18 @@ class WorkoutLogsSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         )
+
+    def create(self, validated_data):
+        """ What we want here:
+            - create workout log
+            - create exercise logs for workout log with calculated weights
+        """
+        validated_data['workout_id'] =  _get_next_workout_id()
+
+        workout_log = WorkoutLog.objects.create(**validated_data)
+        # _create_exercise_logs_for_workout_log(workout_log.id)
+
+        return workout_log
 
     def validate(self, data):
         if not self.instance:
