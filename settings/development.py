@@ -7,11 +7,10 @@ SECRET_KEY = 'development-nonsense-key'
 
 DATABASE_DEFAULT = {
     'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': 'development.sqlite3'
-    # 'ENGINE': 'django.db.backends.mysql',
-    # 'NAME': 'django-base-project',
-    # 'USER': 'dbp-user',
-    # 'PASSWORD': 'dbp-password',
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'wouter',
+    'USER': 'wouter',
+    'PASSWORD': None,
 
     # 'HOST': '127.0.0.1',
     # 'PORT': '3306',

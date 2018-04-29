@@ -39,13 +39,17 @@ class ExerciseLog(ModelMixinBundle):
         default=LogStatus.NOT_STARTED.value
     )
     weight = models.DecimalField(
-        max_digits=2,
+        max_digits=4,
         decimal_places=1,
         null=False
     )
-    amrap_reps = models.PositiveSmallIntegerField(null=False)
+    amrap_reps = models.PositiveSmallIntegerField(null=True)
 
-    workout = models.ForeignKey('WorkoutLog', on_delete=models.CASCADE)
+    workout_log = models.ForeignKey(
+        'WorkoutLog',
+        on_delete=models.CASCADE,
+        related_name='exercise_logs'
+    )
     exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):

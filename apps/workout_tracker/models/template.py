@@ -23,13 +23,18 @@ class Week(ModelMixinBundle):
         max_length=200
     )
     position = models.PositiveSmallIntegerField(null=False)
+    ordering = ('position', )
 
     class Meta:
         unique_together = ('program', 'name')
 
 
 class Workout(ModelMixinBundle):
-    week = models.ForeignKey('Week', on_delete=models.CASCADE)
+    week = models.ForeignKey(
+        'Week',
+        on_delete=models.CASCADE,
+        related_name='workouts'
+    )
 
     name = models.CharField(
         db_index=True,
@@ -41,6 +46,7 @@ class Workout(ModelMixinBundle):
 
     class Meta:
         unique_together = ('week', 'name')
+        ordering = ('position', )
 
 
 class ExerciseType(ModelMixinBundle):
@@ -62,7 +68,14 @@ class Exercise(ModelMixinBundle):
     reps = models.PositiveSmallIntegerField(null=True)
     weight_multiplier = models.DecimalField(max_digits=3, decimal_places=2)
     is_amrap = models.NullBooleanField()
+    position = models.PositiveSmallIntegerField(null=False)
 
     exercise_type = models.ForeignKey('ExerciseType', on_delete=models.CASCADE)
-    workout = models.ForeignKey('Workout', related_name='exercises', on_delete=models.CASCADE)
-    position = models.PositiveSmallIntegerField(null=False)
+    workout = models.ForeignKey(
+        'Workout',
+        related_name='exercises',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ('position', )

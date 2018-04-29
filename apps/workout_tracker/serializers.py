@@ -1,9 +1,15 @@
+from decimal import Decimal
+
+from django.db import DatabaseError, transaction
 from rest_framework import serializers
 
 from apps.workout_tracker.models import (
-    LOG_STATUS_CHOICES,
     Exercise,
+    ExerciseLog,
     ExerciseType,
+    LOG_STATUS_CHOICES,
+    LogStatus,
+    Week,
     Workout,
     WorkoutLog
 )
@@ -49,7 +55,63 @@ class WorkoutSerializer(serializers.ModelSerializer):
 
 
 def _get_next_workout_id():
-    return 1
+    latest_workout_log = WorkoutLog.objects.last()
+    if latest_workout_log is None:
+        return Week.objects.first().workouts.first().id
+
+    workouts_in_week = list(latest_workout_log.workout.week.workouts.all())
+    workout_index = workouts_in_week.index(latest_workout_log.workout)
+
+    if workout_index < len(workouts_in_week)-1:
+        return workouts_in_week[workout_index+1].id
+
+    # Go to the next week
+    weeks = list(Week.objects.all())
+    week_index = weeks.index(latest_workout_log.workout.week)
+
+    if week_index < len(weeks)-1:
+        return weeks[week_index+1].workouts.first().id
+
+    # First week, first workout
+    return weeks[0].workouts.first().id
+
+
+def _create_exercise_logs_for_workout_log(workout_log_id, workout_id):
+    workout = Workout.objects.get(id=workout_id)
+
+    try:
+        previous_workout_log = WorkoutLog.objects.order_by('-id')[1]
+    except IndexError:
+        previous_workout_log = None
+    should_increase_weight = (
+        previous_workout_log is not None and
+        previous_workout_log.workout.week_id != workout.week_id
+    )
+
+    for exercise in workout.exercises.all():
+        weight = 20.0  # random starting number
+        latest_exercise_log = ExerciseLog.objects.filter(
+            exercise__exercise_type_id=exercise.exercise_type_id
+        ).last()
+
+        if latest_exercise_log is not None:
+            weight = (
+                latest_exercise_log.weight *
+                exercise.weight_multiplier /
+                latest_exercise_log.exercise.weight_multiplier
+            )
+            weight = weight - weight % Decimal(2.5)  # 1.25kg = lightest plate
+
+            if (should_increase_weight and
+                    latest_exercise_log.status == LogStatus.FINISHED.value):
+                weight = weight + exercise.exercise_type.weight_progression
+
+        ExerciseLog.objects.create(
+            exercise_id=exercise.id,
+            workout_log_id=workout_log_id,
+            status=LogStatus.FINISHED.value,
+            weight=weight
+        )
 
 
 class WorkoutLogsSerializer(serializers.ModelSerializer):
@@ -75,10 +137,18 @@ class WorkoutLogsSerializer(serializers.ModelSerializer):
             - create workout log
             - create exercise logs for workout log with calculated weights
         """
-        validated_data['workout_id'] =  _get_next_workout_id()
+        for i in range(7):
+            validated_data['workout_id'] = _get_next_workout_id()
 
-        workout_log = WorkoutLog.objects.create(**validated_data)
-        # _create_exercise_logs_for_workout_log(workout_log.id)
+            try:
+                with transaction.atomic():
+                    validated_data['status'] = LogStatus.FINISHED.value
+                    workout_log = WorkoutLog.objects.create(**validated_data)
+                    _create_exercise_logs_for_workout_log(
+                        workout_log.id, validated_data['workout_id']
+                    )
+            except DatabaseError:
+                return WorkoutLog(**validated_data)  # nice django error pls
 
         return workout_log
 

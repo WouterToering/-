@@ -7,6 +7,7 @@ from apps.workout_tracker.models.template import (
 )
 from apps.workout_tracker.models.log import (
     LOG_STATUS_CHOICES,
+    LogStatus,
     WorkoutLog,
     ExerciseLog
 )

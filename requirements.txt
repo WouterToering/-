@@ -19,6 +19,7 @@ djangorestframework==3.8.2
 greenlet==0.4.13          # via bpython
 idna==2.6                 # via requests
 invoke==0.22.1
+psycopg2==2.7.4
 pygments==2.2.0           # via bpython
 pyjwt==1.6.1              # via djangorestframework-jwt
 pytz==2018.4              # via django
