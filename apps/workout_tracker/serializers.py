@@ -100,11 +100,6 @@ def _create_exercise_logs_for_workout_log(workout_log_id, workout_id):
                 exercise.weight_multiplier /
                 latest_exercise_log.exercise.weight_multiplier
             )
-            weight = weight - weight % Decimal(2.5)  # 1.25kg = lightest plate
-
-            if (should_increase_weight and
-                    latest_exercise_log.status == LogStatus.FINISHED.value):
-                weight = weight + exercise.exercise_type.weight_progression
 
         ExerciseLog.objects.create(
             exercise_id=exercise.id,
