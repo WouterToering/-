@@ -79,27 +79,15 @@ def _get_next_workout_id():
 def _create_exercise_logs_for_workout_log(workout_log_id, workout_id):
     workout = Workout.objects.get(id=workout_id)
 
-    try:
-        previous_workout_log = WorkoutLog.objects.order_by('-id')[1]
-    except IndexError:
-        previous_workout_log = None
-    should_increase_weight = (
-        previous_workout_log is not None and
-        previous_workout_log.workout.week_id != workout.week_id
-    )
-
     for exercise in workout.exercises.all():
-        weight = 20.0  # random starting number
         latest_exercise_log = ExerciseLog.objects.filter(
-            exercise__exercise_type_id=exercise.exercise_type_id
+            exercise__exercise_type_id=exercise.exercise_type_id,
+            exercise__weight_multiplier=exercise.weight_multiplier
         ).last()
 
+        weight = 20.0  # random starting number
         if latest_exercise_log is not None:
-            weight = (
-                latest_exercise_log.weight *
-                exercise.weight_multiplier /
-                latest_exercise_log.exercise.weight_multiplier
-            )
+            weight = latest_exercise_log.weight
 
         ExerciseLog.objects.create(
             exercise_id=exercise.id,
@@ -132,18 +120,17 @@ class WorkoutLogsSerializer(serializers.ModelSerializer):
             - create workout log
             - create exercise logs for workout log with calculated weights
         """
-        for i in range(7):
-            validated_data['workout_id'] = _get_next_workout_id()
+        validated_data['workout_id'] = _get_next_workout_id()
 
-            try:
-                with transaction.atomic():
-                    validated_data['status'] = LogStatus.FINISHED.value
-                    workout_log = WorkoutLog.objects.create(**validated_data)
-                    _create_exercise_logs_for_workout_log(
-                        workout_log.id, validated_data['workout_id']
-                    )
-            except DatabaseError:
-                return WorkoutLog(**validated_data)  # nice django error pls
+        try:
+            with transaction.atomic():
+                validated_data['status'] = LogStatus.FINISHED.value
+                workout_log = WorkoutLog.objects.create(**validated_data)
+                _create_exercise_logs_for_workout_log(
+                    workout_log.id, validated_data['workout_id']
+                )
+        except DatabaseError:
+            return WorkoutLog(**validated_data)  # nice django error pls
 
         return workout_log
 
