@@ -97,9 +97,26 @@ def _create_exercise_logs_for_workout_log(workout_log_id, workout_id):
         )
 
 
+class ExerciseLogsSerializer(serializers.ModelSerializer):
+    exercise = ExerciseSerializer(read_only=True)
+
+    class Meta:
+        model = ExerciseLog
+
+        fields = (
+            'status',
+            'weight',
+            'amrap_reps',
+            'exercise'
+        )
+
+
 class WorkoutLogsSerializer(serializers.ModelSerializer):
     status = ChoiceField(choices=LOG_STATUS_CHOICES, default=0)
     workout = WorkoutSerializer(read_only=True)
+    exercise_logs = ExerciseLogsSerializer(
+        serializers.ModelSerializer, many=True, read_only=True
+    )
 
     class Meta:
         model = WorkoutLog
@@ -112,7 +129,8 @@ class WorkoutLogsSerializer(serializers.ModelSerializer):
             'workout',
             'finished_at',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'exercise_logs'
         )
 
     def create(self, validated_data):
