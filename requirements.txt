@@ -13,7 +13,7 @@ curtsies==0.3.0           # via bpython
 django-extensions==2.0.7
 django-js-asset==1.1.0    # via django-mptt
 django-mptt==0.9.0
-django==2.0.4
+django==2.2.10
 djangorestframework-jwt==1.11.0
 djangorestframework==3.8.2
 greenlet==0.4.13          # via bpython
@@ -25,6 +25,7 @@ pyjwt==1.6.1              # via djangorestframework-jwt
 pytz==2018.4              # via django
 requests==2.18.4          # via bpython
 six==1.11.0               # via bpython, django-extensions
+sqlparse==0.3.0           # via django
 typing==3.6.4             # via curtsies
 urllib3==1.22             # via requests
 wcwidth==0.1.7            # via curtsies
